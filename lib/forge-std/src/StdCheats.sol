@@ -1,7 +1,5 @@
-// SPDX-License-Identifier: MIT
-pragma solidity >=0.6.2 <0.9.0;
-
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: MIT OR Apache-2.0
+pragma solidity >=0.8.13 <0.9.0;
 
 import {StdStorage, stdStorage} from "./StdStorage.sol";
 import {console2} from "./console2.sol";
@@ -326,7 +324,7 @@ abstract contract StdCheatsSafe {
         vm.assume(addr < address(0x1) || addr > address(0xff));
 
         // forgefmt: disable-start
-        if (chainId == 10 || chainId == 420) {
+        if (chainId == 10 || chainId == 420 || chainId == 11155420) {
             // https://github.com/ethereum-optimism/optimism/blob/eaa371a0184b56b7ca6d9eb9cb0a2b78b2ccd864/op-bindings/predeploys/addresses.go#L6-L21
             vm.assume(addr < address(0x4200000000000000000000000000000000000000) || addr > address(0x4200000000000000000000000000000000000800));
         } else if (chainId == 42161 || chainId == 421613) {
@@ -392,6 +390,7 @@ abstract contract StdCheatsSafe {
     function rawToConvertedEIPTx1559(RawTx1559 memory rawTx) internal pure virtual returns (Tx1559 memory) {
         Tx1559 memory transaction;
         transaction.arguments = rawTx.arguments;
+        transaction.contractAddress = rawTx.contractAddress;
         transaction.contractName = rawTx.contractName;
         transaction.functionSig = rawTx.functionSig;
         transaction.hash = rawTx.hash;
@@ -501,8 +500,7 @@ abstract contract StdCheatsSafe {
     // e.g. `deployCode(code, abi.encode(arg1,arg2,arg3))`
     function deployCode(string memory what, bytes memory args) internal virtual returns (address addr) {
         bytes memory bytecode = abi.encodePacked(vm.getCode(what), args);
-        /// @solidity memory-safe-assembly
-        assembly {
+        assembly ("memory-safe") {
             addr := create(0, add(bytecode, 0x20), mload(bytecode))
         }
 
@@ -511,8 +509,7 @@ abstract contract StdCheatsSafe {
 
     function deployCode(string memory what) internal virtual returns (address addr) {
         bytes memory bytecode = vm.getCode(what);
-        /// @solidity memory-safe-assembly
-        assembly {
+        assembly ("memory-safe") {
             addr := create(0, add(bytecode, 0x20), mload(bytecode))
         }
 
@@ -522,8 +519,7 @@ abstract contract StdCheatsSafe {
     /// @dev deploy contract with value on construction
     function deployCode(string memory what, bytes memory args, uint256 val) internal virtual returns (address addr) {
         bytes memory bytecode = abi.encodePacked(vm.getCode(what), args);
-        /// @solidity memory-safe-assembly
-        assembly {
+        assembly ("memory-safe") {
             addr := create(val, add(bytecode, 0x20), mload(bytecode))
         }
 
@@ -532,8 +528,7 @@ abstract contract StdCheatsSafe {
 
     function deployCode(string memory what, uint256 val) internal virtual returns (address addr) {
         bytes memory bytecode = vm.getCode(what);
-        /// @solidity memory-safe-assembly
-        assembly {
+        assembly ("memory-safe") {
             addr := create(val, add(bytecode, 0x20), mload(bytecode))
         }
 
@@ -715,6 +710,7 @@ abstract contract StdCheats is StdCheatsSafe {
     }
 
     function changePrank(address msgSender, address txOrigin) internal virtual {
+        console2_log_StdCheats("changePrank is deprecated. Please use vm.startPrank instead.");
         vm.stopPrank();
         vm.startPrank(msgSender, txOrigin);
     }

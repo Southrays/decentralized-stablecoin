@@ -1,5 +1,5 @@
-// SPDX-License-Identifier: MIT
-pragma solidity >=0.6.2;
+// SPDX-License-Identifier: MIT OR Apache-2.0
+pragma solidity >=0.8.13 <0.9.0;
 
 import {IERC7575} from "./IERC7575.sol";
 
@@ -64,10 +64,7 @@ interface IERC7540Deposit is IERC7540Operator {
      * - MUST NOT show any variations depending on the caller.
      * - MUST NOT revert unless due to integer overflow caused by an unreasonably large input.
      */
-    function pendingDepositRequest(uint256 requestId, address controller)
-        external
-        view
-        returns (uint256 pendingAssets);
+    function pendingDepositRequest(uint256 requestId, address controller) external view returns (uint256 pendingAssets);
 
     /**
      * @dev Returns the amount of requested assets in Claimable state for the controller to deposit or mint.
@@ -127,10 +124,7 @@ interface IERC7540Redeem is IERC7540Operator {
      * - MUST NOT show any variations depending on the caller.
      * - MUST NOT revert unless due to integer overflow caused by an unreasonably large input.
      */
-    function pendingRedeemRequest(uint256 requestId, address controller)
-        external
-        view
-        returns (uint256 pendingShares);
+    function pendingRedeemRequest(uint256 requestId, address controller) external view returns (uint256 pendingShares);
 
     /**
      * @dev Returns the amount of requested shares in Claimable state for the controller to redeem or withdraw.

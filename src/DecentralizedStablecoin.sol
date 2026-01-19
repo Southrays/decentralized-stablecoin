@@ -5,23 +5,22 @@ pragma solidity ^0.8.19;
 import {ERC20Burnable, ERC20} from "@openzeppelin-contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import {Ownable} from "@openzeppelin-contracts/access/Ownable.sol";
 
-
 /**
  * @title DecentralizedStablecoin
  * @author Southrays
- * Collateral: Exogenous (wETH & wBTC) 
+ * Collateral: Exogenous (wETH & wBTC)
  * Minting: Algorithmic
  * Relative Stability: Pegged 1:1 to USD
- * 
+ *
  * This is the ERC20 contract for the Decentralized Stablecoin (DSC).
  */
 contract DecentralizedStablecoin is ERC20Burnable, Ownable {
     ////////////////////////////
     /////     Errors     //////
     //////////////////////////
-    error DecentralizedStablecoin__MustBeOwner(); 
-    error DecentralizedStablecoin__MustBeMoreThanZero(); 
-    error DecentralizedStablecoin__NotZeroAddress(); 
+    error DecentralizedStablecoin__MustBeOwner();
+    error DecentralizedStablecoin__MustBeMoreThanZero();
+    error DecentralizedStablecoin__NotZeroAddress();
     error DecentralizedStablecoin__BurnAmountExceedsBalance();
 
     /////////////////////////////////
@@ -42,7 +41,6 @@ contract DecentralizedStablecoin is ERC20Burnable, Ownable {
         if (balance < _amount) revert DecentralizedStablecoin__BurnAmountExceedsBalance();
         super.burn(_amount);
     }
-
 
     /**
      * This function can only be called by the owner to mint new DecentralizedStablecoin (DSC).

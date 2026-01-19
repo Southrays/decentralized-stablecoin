@@ -20,7 +20,6 @@ contract DecentralizedStablecoinTest is Test {
     string EXPECTED_NAME = "DecentralizedStablecoin";
     string EXPECTED_SYMBOL = "DSC";
 
-
     ///////////////////////////
     /////     SetUp     //////
     /////////////////////////
@@ -34,7 +33,6 @@ contract DecentralizedStablecoinTest is Test {
         vm.stopPrank();
     }
 
-
     ///////////////////////////////////////
     /////     Constructor Tests     //////
     /////////////////////////////////////
@@ -47,7 +45,6 @@ contract DecentralizedStablecoinTest is Test {
         string memory symbol = dsc.symbol();
         assertEq(symbol, EXPECTED_SYMBOL);
     }
-
 
     ////////////////////////////////
     /////     Mint Tests     //////
@@ -74,8 +71,6 @@ contract DecentralizedStablecoinTest is Test {
         assertTrue(success);
         assertEq(dsc.balanceOf(user), TOKEN_AMOUNT);
     }
-
-
 
     ////////////////////////////////
     /////     Burn Tests     //////

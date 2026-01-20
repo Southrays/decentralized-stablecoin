@@ -1,4 +1,4 @@
-This is a DecentralizedStablecoin system
+This is a DecentralizedStablecoin system.
 The DecentralizedStablecoin has the following properties:
  1. Collateral: Exogenous:
     Backed by wEth & wBtc.

@@ -36,12 +36,12 @@ contract DecentralizedStablecoinTest is Test {
     ///////////////////////////////////////
     /////     Constructor Tests     //////
     /////////////////////////////////////
-    function testName() public {
+    function testName() public view {
         string memory name = dsc.name();
         assertEq(name, EXPECTED_NAME);
     }
 
-    function testSymbol() public {
+    function testSymbol() public view {
         string memory symbol = dsc.symbol();
         assertEq(symbol, EXPECTED_SYMBOL);
     }

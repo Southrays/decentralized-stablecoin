@@ -67,7 +67,7 @@ contract DSCEngine is ReentrancyGuard {
     mapping(address user => uint256 amount) s_dscBalances;
 
     address[] s_collateralTokens;
-    DecentralizedStablecoin private immutable i_dsc;
+    DecentralizedStablecoin public immutable i_dsc;
 
     //////////////////////////////
     /////     Modifiers     /////
@@ -341,16 +341,47 @@ contract DSCEngine is ReentrancyGuard {
     /////     Public & External View Functions     /////
     ///////////////////////////////////////////////////
     /**
+     * This function return the collateral value of the user.
+     * @param _collateralToken The collateral token.
+     * @param _user The user who's collateral amount is being checked.
+     * @notice This is the actual deposited collateral amount, not it's $ usd value.
+     */
+    function getUserCollateralAmount(address _user, address _collateralToken)
+        public
+        view
+        isTokenAllowed(_collateralToken)
+        returns (uint256)
+    {
+        return s_collateralBalances[_user][_collateralToken];
+    }
+    /**
+     * This function gets the total DSC minted by the user and the $ usd
+     *  value of the total collateral deposited by the user.
+     * @param _user The user whose account information is being checked
+     * @return totalDscMinted The total DSC minted by the user
+     * @return collateralValueInUsd The usd value total collateral tokens
+     *  deposited by the user.
+     */
+
+    function getAccountInformation(address _user)
+        public
+        view
+        returns (uint256 totalDscMinted, uint256 collateralValueInUsd)
+    {
+        (totalDscMinted, collateralValueInUsd) = _getAccountInformation(_user);
+    }
+    /**
      * This function gets the sum $ usd values of all the collateral tokens the user
      *  has deposited.
      * @param _user This is the user whose total deposited collateral is being evaluated.
      */
+
     function getAccountCollateralValue(address _user) public view returns (uint256 accountCollateralValue) {
         for (uint256 i = 0; i < s_collateralTokens.length; i++) {
             address token = s_collateralTokens[i];
             uint256 amount = s_collateralBalances[_user][token];
             uint256 tokenUsdValue = getUsdValue(token, amount);
-            accountCollateralValue = tokenUsdValue++;
+            accountCollateralValue += tokenUsdValue;
         }
     }
 
@@ -366,12 +397,11 @@ contract DSCEngine is ReentrancyGuard {
         public
         view
         isTokenAllowed(_collateralToken)
-        moreThanZero(_collateralTokenAmount)
         returns (uint256 collateralValueInUsd)
     {
         AggregatorV3Interface priceFeed = AggregatorV3Interface(s_priceFeeds[_collateralToken]);
         (, int256 price,,,) = priceFeed.latestRoundData();
-        collateralValueInUsd = ((uint256(price) * ADDITIONAL_FEED_PRECISION) + _collateralTokenAmount) / PRECISION;
+        collateralValueInUsd = ((uint256(price) * ADDITIONAL_FEED_PRECISION) * _collateralTokenAmount) / PRECISION;
     }
 
     function getTokenAmountFromUsdAmount(address _collateralToken, uint256 _usdAmountInWei)

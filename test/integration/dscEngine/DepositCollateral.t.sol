@@ -39,17 +39,6 @@ contract DepositCollateral is Test {
         ERC20Mock(wEth).mint(user, STARTING_ETH_BALANCE);
     }
 
-    /////////////////////////////
-    /////     Modifier     /////
-    ///////////////////////////
-    // modifier depositedCollateral() {
-    //     vm.startPrank(user);
-    //     ERC20Mock(wEth).approve(address(dscEngine), AMOUNT_COLLATERAL);
-    //     dscEngine.depositCollateral(wEth, AMOUNT_DEPOSIT);
-    //     vm.stopPrank();
-    //     _;
-    // }
-
     /////////////////////////////////////////////
     /////     Deposit Collateral Tests     /////
     ///////////////////////////////////////////
@@ -99,7 +88,7 @@ contract DepositCollateral is Test {
         assertEq(endingUserBalance, startingUserBalance + AMOUNT_DEPOSIT);
     }
 
-    function testDepositUpdatesCollateralEmits() public {
+    function testDepositCollateralEmits() public {
         vm.startPrank(user);
         ERC20Mock(wEth).approve(address(dscEngine), AMOUNT_COLLATERAL);
         vm.expectEmit(true, true, true, true);
@@ -108,7 +97,7 @@ contract DepositCollateral is Test {
         vm.stopPrank();
     }
 
-    function testRevertIfAmountIsZero() public {
+    function testRevertDepositIfAmountIsZero() public {
         vm.startPrank(user);
         ERC20Mock(wEth).approve(address(dscEngine), AMOUNT_COLLATERAL);
         vm.expectRevert(DSCEngine.DSCEngine__MustBeMoreThanZero.selector);
@@ -116,7 +105,7 @@ contract DepositCollateral is Test {
         vm.stopPrank();
     }
 
-    function testRevertNotAllowedToken() public {
+    function testRevertDepositIfTokenIsNotAllowed() public {
         vm.startPrank(user);
         vm.expectRevert(DSCEngine.DSCEngine__NotAllowedToken.selector);
         dscEngine.depositCollateral(RANDOM_TOKEN, AMOUNT_COLLATERAL);

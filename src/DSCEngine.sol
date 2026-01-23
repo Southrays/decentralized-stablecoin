@@ -261,7 +261,6 @@ contract DSCEngine is ReentrancyGuard {
      */
     function _redeemCollateral(address _from, address _to, address _collateralToken, uint256 _amountCollateral)
         private
-        nonReentrant
     {
         if (s_collateralBalances[_from][_collateralToken] == 0) revert DSCEngine__InsufficientBalance();
         s_collateralBalances[_from][_collateralToken] -= _amountCollateral;
@@ -312,6 +311,9 @@ contract DSCEngine is ReentrancyGuard {
      */
     function _healthFactor(address _user) private view returns (uint256 _userHealthFactor) {
         (uint256 totalDscMinted, uint256 collateralValueInUsd) = _getAccountInformation(_user);
+        if (totalDscMinted == 0) {
+            return type(uint256).max;
+        }
         uint256 collateralAdjustedForThreshold = (collateralValueInUsd * LIQUIDATION_THRESHOLD) / LIQUIDATION_PRECISION;
         _userHealthFactor = (collateralAdjustedForThreshold * PRECISION) / totalDscMinted;
 
@@ -354,6 +356,15 @@ contract DSCEngine is ReentrancyGuard {
     {
         return s_collateralBalances[_user][_collateralToken];
     }
+
+    /**
+     * This function gets the Health Factor of a user.
+     * @param _user This is the user whose Health Factor is being checked
+     */
+    function getHealthFactor(address _user) public view returns (uint256) {
+        return _healthFactor(_user);
+    }
+
     /**
      * This function gets the total DSC minted by the user and the $ usd
      *  value of the total collateral deposited by the user.
@@ -362,7 +373,6 @@ contract DSCEngine is ReentrancyGuard {
      * @return collateralValueInUsd The usd value total collateral tokens
      *  deposited by the user.
      */
-
     function getAccountInformation(address _user)
         public
         view

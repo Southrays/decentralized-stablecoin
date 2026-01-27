@@ -36,7 +36,7 @@ contract DSCEngine is ReentrancyGuard {
     error DSCEngine__MintFailed();
     error DSCEngine__BurnFailed();
     error DSCEngine__RedeemFailed();
-    error DSCEngine__TransactionBreaksHealthFactor(uint256 healthFactor);
+    error DSCEngine__TransactionBreaksHealthFactor();
     error DSCEngine__HealthFactorIsNotBroken();
     error DSCEngine__HealthFactorNotImproved();
     error DSCEngine__TokensLengthAndPriceFeedsLengthMismatch();
@@ -109,7 +109,6 @@ contract DSCEngine is ReentrancyGuard {
      */
     function depositCollateralAndMintDsc(address _collateralToken, uint256 _amountCollateral, uint256 _amountDscToMint)
         external
-        nonReentrant
     {
         depositCollateral(_collateralToken, _amountCollateral);
         mintDsc(_amountDscToMint);
@@ -123,7 +122,6 @@ contract DSCEngine is ReentrancyGuard {
      */
     function RedeemCollateralForDsc(address _collateralToken, uint256 _amountCollateral, uint256 _amountDscToBurn)
         external
-        nonReentrant
     {
         burnDsc(_amountDscToBurn);
         redeemCollateral(_collateralToken, _amountCollateral);
@@ -240,7 +238,7 @@ contract DSCEngine is ReentrancyGuard {
      * @notice Follows CEI.
      * @param _amountDscToBurn The amount of DSC tokens to be minted.
      */
-    function burnDsc(uint256 _amountDscToBurn) public moreThanZero(_amountDscToBurn) nonReentrant {
+    function burnDsc(uint256 _amountDscToBurn) public moreThanZero(_amountDscToBurn) {
         _burnDsc(msg.sender, msg.sender, _amountDscToBurn);
     }
 
@@ -336,7 +334,7 @@ contract DSCEngine is ReentrancyGuard {
     function _revertIfHealthFactorIsBroken(address _user) internal view {
         uint256 userHealthFactor = _healthFactor(_user);
 
-        if (userHealthFactor < MIN_HEALTH_FACTOR) revert DSCEngine__TransactionBreaksHealthFactor(userHealthFactor);
+        if (userHealthFactor < MIN_HEALTH_FACTOR) revert DSCEngine__TransactionBreaksHealthFactor();
     }
 
     /////////////////////////////////////////////////////
@@ -355,6 +353,18 @@ contract DSCEngine is ReentrancyGuard {
         returns (uint256)
     {
         return s_collateralBalances[_user][_collateralToken];
+    }
+
+    /**
+     * This function return the DSC balance of the user.
+     * @param _user The user who's collateral amount is being checked.
+     */
+    function getUserDscBalance(address _user)
+        public
+        view
+        returns (uint256)
+    {
+        return s_dscBalances[_user];
     }
 
     /**
